@@ -1,10 +1,11 @@
 from tensorslow.tensor import Tensor
 from tensorslow import math
+import numpy as np
 
-a = Tensor(2.0)
+a = Tensor(np.random.uniform(0, 1, size=(5, 2)))
 b = Tensor(3.0)
 
-c = a * b + a
+c = b + b * a
 c = math.exp(c)
 c.backward()
 

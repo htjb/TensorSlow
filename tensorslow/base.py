@@ -7,6 +7,11 @@ class TensorBase():
         self._prev = set(_children) # reference to previous tensors
         self._backward = lambda: None
         self._op = _op
+        
+        if isinstance(data, (int, float)):
+            self.shape = ()
+        else:
+            self.shape = self.data.shape
     
     def backward(self):
         # all nodes in the graph making sure each only appears once...
