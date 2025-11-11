@@ -26,6 +26,7 @@ def mul(a, b):
     def _backward():
         # += local_derivative_wrt_a * out.grad
         a.grad += b.data * out.grad
+        # += local_derivative_wrt_b * out.grad
         b.grad += a.data * out.grad
     out._backward = _backward
     return out
