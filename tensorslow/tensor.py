@@ -6,12 +6,12 @@ class Tensor(TensorBase):
         super().__init__(data, _children, _op)
         Tensor.__add__ = add
         Tensor.__mul__ = mul
+        Tensor.__sub__ = sub
 
 def add(a, b):
 
     b = b if isinstance(b, Tensor) else Tensor(b)
     out = Tensor(a.data + b.data, (a, b), "+")
-    print("ADD", a.shape, b.shape, out.shape)
 
     def _backward():
         a.grad += unbroadcast_grad(1 * out.grad, a.shape)
@@ -29,5 +29,15 @@ def mul(a, b):
         a.grad += unbroadcast_grad(b.data * out.grad, a.shape)
         # += local_derivative_wrt_b * out.grad
         b.grad += unbroadcast_grad(a.data * out.grad, b.shape)
+    out._backward = _backward
+    return out
+
+def sub(a, b):
+    b = b if isinstance(b, Tensor) else Tensor(b)
+    out = Tensor(a.data - b.data, (a, b), "-")
+
+    def _backward():
+        a.grad += unbroadcast_grad(1 * out.grad, a.shape)
+        b.grad += unbroadcast_grad(-1 * out.grad, b.shape)
     out._backward = _backward
     return out

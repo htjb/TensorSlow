@@ -5,7 +5,6 @@ def unbroadcast_grad(grad, shape):
     Sum the gradients along axes that were broadcasted.
     """
     # collapse leading dimensions
-
     while len(grad.shape) > len(shape):
         grad = grad.sum(axis=0)
     # sum along dimensions that were broadcasted
