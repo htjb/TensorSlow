@@ -1,42 +1,31 @@
-import numpy as np
-from tensorslow.operations import add, mul
+from tensorslow.base import TensorBase
 
-class Tensor():
+class Tensor(TensorBase):
     def __init__(self, data, _children=(), _op=""):
-        self.data = data
-        self.grad = np.zeros_like(data)
-        self._prev = set(_children) # reference to previous tensors
-        self._backward = lambda: None
-        self._op = _op
-
+        super().__init__(data, _children, _op)
         Tensor.__add__ = add
         Tensor.__mul__ = mul
+
+def add(a, b):
+
+    b = b if isinstance(b, Tensor) else Tensor(b)
+    out = Tensor(a.data + b.data, (a, b), "+")
+
+
+    def _backward():
+        a.grad += 1 * out.grad
+        b.grad += 1 * out.grad
+    out._backward = _backward
+    return out
+
+def mul(a, b):
     
-    def backward(self):
-        # all nodes in the graph making sure each only appears once...
-        topo = []
-        visited = set()
+    b = b if isinstance(b, Tensor) else Tensor(b)
+    out = Tensor(a.data * b.data, (a, b), '*')
 
-        def build_topo(v):
-            """
-            Traverse through the computation graph and for each tensor v
-            explore the parents. Once all dependencies have been explored append
-            v to the topology. Effectively checks each branch of the graph all
-            the way back to initial tensors. topo has nodes ordered from input
-            to ouput so needs reversing.
-            """
-            if v not in visited:
-                visited.add(v)
-                for child in v._prev:
-                    build_topo(child)
-                topo.append(v)
-            
-        build_topo(self)
-        # initialize the gradients (grad of tensor with respect to itself is 1)
-        self.grad = np.ones_like(self.data)
-
-        # iterate from ouput to input. Each nodes _backward() uses current .grad
-        # accumulated gradient from downstream applies the chain rule and
-        # updates grad of the parents.
-        for node in reversed(topo):
-            node._backward()
+    def _backward():
+        # += local_derivative_wrt_a * out.grad
+        a.grad += b.data * out.grad
+        b.grad += a.data * out.grad
+    out._backward = _backward
+    return out
