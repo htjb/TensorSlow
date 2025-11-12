@@ -15,14 +15,14 @@ class TensorBase:
         """Initialize a TensorBase instance.
 
         Args:
-            data (Union[int, float, np.ndarray]): The data for the tensor.
+            data (int | float | np.ndarray): The data for the tensor.
             _children (tuple, optional): Previous tensors in the
                 computation graph. Defaults to ().
             _op (str, optional): Operation that produced this tensor.
                     Defaults to "".
 
         Attributes:
-            data (Union[int, float, np.ndarray]): The data of the tensor.
+            data (int | float | np.ndarray): The data of the tensor.
             grad (np.ndarray): The gradient of the tensor,
                 initialized to zeros.
             _prev (set): Set of previous tensors in the computation graph.
