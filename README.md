@@ -7,7 +7,7 @@ differentiation.
 ## Example
 
 The following script calculates the gradient over a sigmoid function with 
-respect to two inputs a and b then plots a vs $$\delta c/\delta a$.
+respect to two inputs a and b then plots a vs $\delta c/\delta a$.
 
 ```python
 """Test script for TensorSlow library."""
