@@ -65,8 +65,6 @@ def mul(a: Tensor, b: Tensor | int | float | np.ndarray) -> Tensor:
     b = b if isinstance(b, Tensor) else Tensor(b)
     out = Tensor(a.data * b.data, (a, b), "*")
 
-    print(type(a.data), type(b.data), type(out.data))
-
     def _backward() -> None:
         """Backward pass for element-wise multiplication."""
         # += local_derivative_wrt_a * out.grad
