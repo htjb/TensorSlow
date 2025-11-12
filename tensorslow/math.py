@@ -1,5 +1,5 @@
 import numpy as np
-#from tensorslow.utils import unbroadcast_grad
+from tensorslow.utils import unbroadcast_grad, unreduce_grad
 from tensorslow.tensor import Tensor
 
 def exp(a: Tensor) -> Tensor:
@@ -23,10 +23,11 @@ def sigmoid(a: Tensor) -> Tensor:
     out._backward = _backward
     return out
 
-"""def sum(a, axis, keepdims=False):
+def sum(a, axis, keepdims=False):
     out = Tensor(np.sum(a.data, axis=axis, keepdims=keepdims), (a,), "sum")
+    print(a.shape, out.shape)
 
     def _backward():
-        a.grad += unbroadcast_grad(out.grad, a.shape)
+        a.grad += unreduce_grad(out.grad, a.shape, axis=axis)
     out._backward = _backward
-    return out"""
+    return out

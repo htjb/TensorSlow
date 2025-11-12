@@ -1,6 +1,21 @@
+import numpy as np
 
 
-def unbroadcast_grad(grad, shape):
+def unreduce_grad(grad, shape, axis=None):
+    """
+    Expand the gradients along reduced axes.
+    """
+    if axis is None:
+        axis = tuple(range(len(shape)))
+    elif isinstance(axis, int):
+        axis = (axis,)
+
+    for ax in sorted(axis):
+        grad = np.expand_dims(grad, ax)
+    grad = np.broadcast_to(grad, shape)
+    return grad
+
+def unbroadcast_grad(grad, shape, axis=None):
     """
     Sum the gradients along axes that were broadcasted.
     """
