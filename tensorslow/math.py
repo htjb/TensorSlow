@@ -39,7 +39,6 @@ def sum(a: Tensor, axis: int, keepdims: bool = False) -> Tensor:
         Tensor: Output tensor after summation.
     """
     out = Tensor(np.sum(a.data, axis=axis, keepdims=keepdims), (a,), "sum")
-    print(a.shape, out.shape)
 
     def _backward() -> None:
         """Backward pass for summation."""
