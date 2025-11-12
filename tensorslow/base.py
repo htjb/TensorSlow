@@ -32,7 +32,7 @@ class TensorBase:
 
         """
         self.data = data
-        self.grad = np.zeros_like(data)
+        self.grad = np.zeros_like(data, dtype=np.float64)
         self._prev = set(_children)  # reference to previous tensors
         self._backward = lambda: None
         self._op = _op
@@ -63,7 +63,7 @@ class TensorBase:
 
         build_topo(self)
         # initialize the gradients (grad of tensor with respect to itself is 1)
-        self.grad = np.ones_like(self.data)
+        self.grad = np.ones_like(self.data, dtype=np.float64)
 
         # iterate from ouput to input. Each nodes _backward()
         # uses current .grad
