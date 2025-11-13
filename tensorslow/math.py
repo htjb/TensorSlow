@@ -27,13 +27,16 @@ def exp(a: Tensor) -> Tensor:
 
 
 def sum(
-    a: Tensor, axis: int | tuple[int, ...] | None, keepdims: bool = False
+    a: Tensor,
+    axis: int | tuple[int, ...] | None = None,
+    keepdims: bool = False,
 ) -> Tensor:
     """Sum of tensor elements along a specified axis.
 
     Args:
         a (Tensor): Input tensor.
         axis (int): Axis along which to sum.
+            Defaults to None (sum over all axes).
         keepdims (bool, optional): Whether to keep the reduced dimensions.
             Defaults to False.
 
