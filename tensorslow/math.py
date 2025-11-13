@@ -1,33 +1,50 @@
+"""Math operations for TensorSlow."""
+
 import numpy as np
-from tensorslow.utils import unbroadcast_grad, unreduce_grad
+
 from tensorslow.tensor import Tensor
+from tensorslow.utils import unreduce_grad
+
 
 def exp(a: Tensor) -> Tensor:
+    """Exponential function applied element-wise.
 
+    Args:
+        a (Tensor): Input tensor.
+
+    Returns:
+        Tensor: Output tensor after applying exponential function.
+    """
     out = Tensor(np.exp(a.data), (a,), "exp")
 
-    def _backward():
+    def _backward() -> None:
+        """Backward pass for exponential function."""
         # local derivative wrt a * out.grad
         a.grad += np.exp(a.data) * out.grad
+
     out._backward = _backward
     return out
 
-def sigmoid(a: Tensor) -> Tensor:
 
-    sig = 1 / (1 + np.exp(-a.data))
-    out = Tensor(sig, (a,), "sigmoid")
+def sum(
+    a: Tensor, axis: int | tuple[int, ...] | None, keepdims: bool = False
+) -> Tensor:
+    """Sum of tensor elements along a specified axis.
 
-    def _backward():
-        # local derivative wrt a * out.grad
-        a.grad += (sig * (1 - sig)) * out.grad
-    out._backward = _backward
-    return out
+    Args:
+        a (Tensor): Input tensor.
+        axis (int): Axis along which to sum.
+        keepdims (bool, optional): Whether to keep the reduced dimensions.
+            Defaults to False.
 
-def sum(a, axis, keepdims=False):
+    Returns:
+        Tensor: Output tensor after summation.
+    """
     out = Tensor(np.sum(a.data, axis=axis, keepdims=keepdims), (a,), "sum")
-    print(a.shape, out.shape)
 
-    def _backward():
+    def _backward() -> None:
+        """Backward pass for summation."""
         a.grad += unreduce_grad(out.grad, a.shape, axis=axis)
+
     out._backward = _backward
     return out
