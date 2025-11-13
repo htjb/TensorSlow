@@ -6,7 +6,7 @@ import numpy as np
 def unreduce_grad(
     grad: np.ndarray,
     shape: int | tuple[int, ...],
-    axis: int | tuple[int, ...] = None,
+    axis: int | tuple[int, ...] | None = None,
 ) -> np.ndarray:
     """Expand the gradients along reduced axes.
 

@@ -26,7 +26,9 @@ def exp(a: Tensor) -> Tensor:
     return out
 
 
-def sum(a: Tensor, axis: int, keepdims: bool = False) -> Tensor:
+def sum(
+    a: Tensor, axis: int | tuple[int, ...] | None, keepdims: bool = False
+) -> Tensor:
     """Sum of tensor elements along a specified axis.
 
     Args:
