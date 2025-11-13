@@ -28,6 +28,7 @@ class Tensor(TensorBase):
         Tensor.__add__ = add
         Tensor.__mul__ = mul
         Tensor.__sub__ = sub
+        Tensor.__pow__ = pow
 
 
 def add(a: Tensor, b: Tensor | int | float | np.ndarray) -> Tensor:
@@ -93,6 +94,26 @@ def sub(a: Tensor, b: Tensor | int | float | np.ndarray) -> Tensor:
         """Backward pass for element-wise subtraction."""
         a.grad += unbroadcast_grad(1 * out.grad, a.shape)
         b.grad += unbroadcast_grad(-1 * out.grad, b.shape)
+
+    out._backward = _backward
+    return out
+
+
+def pow(a: Tensor, exponent: int | float) -> Tensor:
+    """Element-wise power operation.
+
+    Args:
+        a (Tensor): Input tensor.
+        exponent (int | float): The exponent to raise the tensor to.
+
+    Returns:
+        Tensor: Resultant tensor after exponentiation.
+    """
+    out = Tensor(a.data**exponent, (a,), f"pow_{exponent}")
+
+    def _backward() -> None:
+        """Backward pass for power operation."""
+        a.grad += exponent * (a.data ** (exponent - 1)) * out.grad
 
     out._backward = _backward
     return out
