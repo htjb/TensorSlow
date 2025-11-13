@@ -18,7 +18,7 @@ class Tensor(TensorBase):
         """Initialize a Tensor instance.
 
         Args:
-            data (Union[int, float, np.ndarray]): The data for the tensor.
+            data (int | float | np.ndarray): The data for the tensor.
             _children (tuple, optional): Previous tensors in the
                 computation graph. Defaults to ().
             _op (str, optional): Operation that produced this tensor.
