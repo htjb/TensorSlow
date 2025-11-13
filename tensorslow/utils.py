@@ -4,7 +4,9 @@ import numpy as np
 
 
 def unreduce_grad(
-    grad: np.ndarray, shape: int | tuple, axis: int | tuple = None
+    grad: np.ndarray,
+    shape: int | tuple[int, ...],
+    axis: int | tuple[int, ...] = None,
 ) -> np.ndarray:
     """Expand the gradients along reduced axes.
 
@@ -28,7 +30,9 @@ def unreduce_grad(
     return grad
 
 
-def unbroadcast_grad(grad: np.ndarray, shape: int | tuple) -> np.ndarray:
+def unbroadcast_grad(
+    grad: np.ndarray, shape: int | tuple[int, ...]
+) -> np.ndarray:
     """Adjust gradients for broadcasting.
 
     Args:
