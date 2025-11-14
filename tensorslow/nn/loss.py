@@ -30,7 +30,7 @@ def mse_loss(predicitons: Tensor, target: Tensor) -> Tensor:
             * (predicitons.data - target.data)
             * out.grad
         )
-
+    out._backward = _backward
     return out
 
 
@@ -52,5 +52,5 @@ def mae_loss(predictions: Tensor, target: Tensor) -> Tensor:
         grad = (1 / predictions.data.size) * np.sign(diff) * out.grad
         predictions.grad += grad
         target.grad += -grad
-
+    out._backward = _backward
     return out
