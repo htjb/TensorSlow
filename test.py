@@ -3,21 +3,33 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from tensorslow.nn.activations import sigmoid
+from tensorslow.nn.loss import mse_loss
 from tensorslow.tensor import Tensor
 
-a = Tensor(np.random.uniform(-10, 10, 50))
-bias = Tensor(1)
+x = Tensor(np.linspace(-10, 10, 50))
+y = x * 4 + 2 + Tensor(np.random.randn(50) * 3)
 
-c = sigmoid(a * 2 + bias)
-c.backward()
+m = Tensor(np.random.randn())
+b = Tensor(np.random.randn())
 
-print("a grad:", a.grad)
-print("bias grad:", bias.grad)
+learning_rate = 0.001
 
-plt.plot(a.data, a.grad, ".")
-plt.title("Gradient of sigmoid at different inputs")
-plt.xlabel("Input value")
-plt.ylabel("Gradient value")
-plt.grid()
+loss = []
+for i in range(1000):
+    c = m * x + b
+    loss = mse_loss(c, y)
+    loss.backward()
+    m.data -= learning_rate * m.grad
+    b.data -= learning_rate * b.grad
+    if i % 100 == 0:
+        print(f"Iteration {i}: Loss = {loss.data}")
+    m.grad = np.zeros_like(m.data)
+    b.grad = np.zeros_like(b.data)
+    x.grad = np.zeros_like(x.data)
+    y.grad = np.zeros_like(y.data)
+    loss.grad = np.zeros_like(loss.data)
+
+plt.plot(x.data, y.data, "o", label="Data")
+plt.plot(x.data, (m.data * x.data + b.data), label="Fitted Line")
+plt.legend()
 plt.show()
