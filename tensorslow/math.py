@@ -51,3 +51,22 @@ def sum(
 
     out._backward = _backward
     return out
+
+
+def abs(a: Tensor) -> Tensor:
+    """Absolute value function applied element-wise.
+
+    Args:
+        a (Tensor): Input tensor.
+
+    Returns:
+        Tensor: Output tensor after applying absolute value function.
+    """
+    out = Tensor(np.abs(a.data), (a,), "abs")
+
+    def _backward() -> None:
+        """Backward pass for absolute value function."""
+        a.grad += np.sign(a.data) * out.grad
+
+    out._backward = _backward
+    return out

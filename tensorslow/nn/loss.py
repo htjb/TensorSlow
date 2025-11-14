@@ -1,6 +1,8 @@
 """Standard Loss Functions for TensorSlow."""
 
-from tensorslow.math import sum
+import numpy as np
+
+from tensorslow.math import abs, sum
 from tensorslow.tensor import Tensor
 
 
@@ -28,5 +30,27 @@ def mse_loss(predicitons: Tensor, target: Tensor) -> Tensor:
             * (predicitons.data - target.data)
             * out.grad
         )
+
+    return out
+
+
+def mae_loss(predictions: Tensor, target: Tensor) -> Tensor:
+    """Mean Absolute Error Loss placeholder.
+
+    Args:
+        predictions (Tensor): Predicted values.
+        target (Tensor): Ground truth values.
+
+    Returns:
+        Tensor: Computed MAE loss.
+    """
+    out = sum(abs(predictions - target)) / predictions.data.size
+
+    def _backward() -> None:
+        """Backward pass for MAE Loss."""
+        diff = predictions.data - target.data
+        grad = (1 / predictions.data.size) * np.sign(diff) * out.grad
+        predictions.grad += grad
+        target.grad += -grad
 
     return out
