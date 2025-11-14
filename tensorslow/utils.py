@@ -2,6 +2,8 @@
 
 import numpy as np
 
+from tensorslow.tensor import Tensor
+
 
 def unreduce_grad(
     grad: np.ndarray,
@@ -51,3 +53,31 @@ def unbroadcast_grad(
         if size == 1:
             grad = grad.sum(axis=axis, keepdims=True)
     return grad
+
+def zero_grad(a: Tensor) -> None:
+    """Reset gradients of all tensors in the computation graph.
+
+    Args:
+        a (Tensor): The output tensor from which to start the backpropagation.
+    """
+    topo, visited = [], set()
+
+    def build_topo(v: Tensor) -> None:
+        """Build topological order of the computation graph.
+
+        Traverse through the computation graph and for each tensor v
+        explore the parents. Once all dependencies have been explored
+        append v to the topology. Effectively checks each branch of
+        the graph all the way back to initial tensors. topo has nodes
+        ordered from input to ouput so needs reversing.
+        """
+        if v not in visited:
+            visited.add(v)
+            for child in v._prev:
+                build_topo(child)
+            topo.append(v)
+
+    build_topo(a)
+    print(len(topo), len(visited))
+    for node in reversed(topo):
+        node.grad = np.zeros_like(node.data, dtype=np.float64)
