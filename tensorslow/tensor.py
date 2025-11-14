@@ -14,6 +14,7 @@ class Tensor(TensorBase):
         data: int | float | np.ndarray,
         _children: tuple = (),
         _op: str = "",
+        requires_grad: bool = False,
     ) -> None:
         """Initialize a Tensor instance.
 
@@ -23,8 +24,13 @@ class Tensor(TensorBase):
                 computation graph. Defaults to ().
             _op (str, optional): Operation that produced this tensor.
                     Defaults to "".
+            requires_grad (bool, optional): Whether to track gradients.
+                Defaults to False.
         """
         super().__init__(data, _children, _op)
+        self.requires_grad = requires_grad
+        if not self.requires_grad:
+            self.grad = np.zeros_like(self.data)
         Tensor.__add__ = add
         Tensor.__mul__ = mul
         Tensor.__sub__ = sub
@@ -43,12 +49,15 @@ def add(a: Tensor, b: Tensor | int | float | np.ndarray) -> Tensor:
         Tensor: Resultant tensor after addition.
     """
     b = b if isinstance(b, Tensor) else Tensor(b)
-    out = Tensor(a.data + b.data, (a, b), "+")
+    needs_grad = a.requires_grad or b.requires_grad
+    out = Tensor(a.data + b.data, (a, b), "+", requires_grad=needs_grad)
 
     def _backward() -> None:
         """Backward pass for element-wise addition."""
-        a.grad += unbroadcast_grad(1 * out.grad, a.shape)
-        b.grad += unbroadcast_grad(1 * out.grad, b.shape)
+        if a.requires_grad:
+            a.grad += unbroadcast_grad(1 * out.grad, a.shape)
+        if b.requires_grad:
+            b.grad += unbroadcast_grad(1 * out.grad, b.shape)
 
     out._backward = _backward
     return out
@@ -65,14 +74,17 @@ def mul(a: Tensor, b: Tensor | int | float | np.ndarray) -> Tensor:
         Tensor: Resultant tensor after multiplication.
     """
     b = b if isinstance(b, Tensor) else Tensor(b)
-    out = Tensor(a.data * b.data, (a, b), "*")
+    needs_grad = a.requires_grad or b.requires_grad
+    out = Tensor(a.data * b.data, (a, b), "*", requires_grad=needs_grad)
 
     def _backward() -> None:
         """Backward pass for element-wise multiplication."""
         # += local_derivative_wrt_a * out.grad
-        a.grad += unbroadcast_grad(b.data * out.grad, a.shape)
+        if a.requires_grad:
+            a.grad += unbroadcast_grad(b.data * out.grad, a.shape)
         # += local_derivative_wrt_b * out.grad
-        b.grad += unbroadcast_grad(a.data * out.grad, b.shape)
+        if b.requires_grad:
+            b.grad += unbroadcast_grad(a.data * out.grad, b.shape)
 
     out._backward = _backward
     return out
@@ -89,12 +101,15 @@ def sub(a: Tensor, b: Tensor | int | float | np.ndarray) -> Tensor:
         Tensor: Resultant tensor after subtraction.
     """
     b = b if isinstance(b, Tensor) else Tensor(b)
-    out = Tensor(a.data - b.data, (a, b), "-")
+    needs_grad = a.requires_grad or b.requires_grad
+    out = Tensor(a.data - b.data, (a, b), "-", requires_grad=needs_grad)
 
     def _backward() -> None:
         """Backward pass for element-wise subtraction."""
-        a.grad += unbroadcast_grad(1 * out.grad, a.shape)
-        b.grad += unbroadcast_grad(-1 * out.grad, b.shape)
+        if a.requires_grad:
+            a.grad += unbroadcast_grad(1 * out.grad, a.shape)
+        if b.requires_grad:
+            b.grad += unbroadcast_grad(-1 * out.grad, b.shape)
 
     out._backward = _backward
     return out
@@ -110,11 +125,17 @@ def pow(a: Tensor, exponent: int | float) -> Tensor:
     Returns:
         Tensor: Resultant tensor after exponentiation.
     """
-    out = Tensor(a.data**exponent, (a,), f"pow_{exponent}")
+    out = Tensor(
+        a.data**exponent,
+        (a,),
+        f"pow_{exponent}",
+        requires_grad=a.requires_grad,
+    )
 
     def _backward() -> None:
         """Backward pass for power operation."""
-        a.grad += exponent * (a.data ** (exponent - 1)) * out.grad
+        if a.requires_grad:
+            a.grad += exponent * (a.data ** (exponent - 1)) * out.grad
 
     out._backward = _backward
     return out
@@ -131,12 +152,17 @@ def div(a: Tensor, b: Tensor | int | float | np.ndarray) -> Tensor:
         Tensor: Resultant tensor after division.
     """
     b = b if isinstance(b, Tensor) else Tensor(b)
-    out = Tensor(a.data / b.data, (a, b), "/")
+    needs_grad = a.requires_grad or b.requires_grad
+    out = Tensor(a.data / b.data, (a, b), "/", requires_grad=needs_grad)
 
     def _backward() -> None:
         """Backward pass for element-wise division."""
-        a.grad += unbroadcast_grad((1 / b.data) * out.grad, a.shape)
-        b.grad += unbroadcast_grad((-a.data / (b.data**2)) * out.grad, b.shape)
+        if a.requires_grad:
+            a.grad += unbroadcast_grad((1 / b.data) * out.grad, a.shape)
+        if b.requires_grad:
+            b.grad += unbroadcast_grad(
+                (-a.data / (b.data**2)) * out.grad, b.shape
+            )
 
     out._backward = _backward
     return out
