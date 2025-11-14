@@ -135,8 +135,8 @@ def div(a: Tensor, b: Tensor | int | float | np.ndarray) -> Tensor:
 
     def _backward() -> None:
         """Backward pass for element-wise division."""
-        a.grad += (1 / b.data) * out.grad
-        b.grad += (-a.data / (b.data**2)) * out.grad
+        a.grad += unbroadcast_grad((1 / b.data) * out.grad, a.shape)
+        b.grad += unbroadcast_grad((-a.data / (b.data**2)) * out.grad, b.shape)
 
     out._backward = _backward
     return out
