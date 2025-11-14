@@ -31,11 +31,6 @@ class Tensor(TensorBase):
         self.requires_grad = requires_grad
         if not self.requires_grad:
             self.grad = np.zeros_like(self.data)
-        Tensor.__add__ = add
-        Tensor.__mul__ = mul
-        Tensor.__sub__ = sub
-        Tensor.__pow__ = pow
-        Tensor.__truediv__ = div
 
 
 def add(a: Tensor, b: Tensor | int | float | np.ndarray) -> Tensor:
@@ -166,3 +161,9 @@ def div(a: Tensor, b: Tensor | int | float | np.ndarray) -> Tensor:
 
     out._backward = _backward
     return out
+
+Tensor.__add__ = add
+Tensor.__mul__ = mul
+Tensor.__sub__ = sub
+Tensor.__pow__ = pow
+Tensor.__truediv__ = div
