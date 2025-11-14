@@ -35,7 +35,7 @@ def sum(
 
     Args:
         a (Tensor): Input tensor.
-        axis (int): Axis along which to sum.
+        axis (int | tuple[int, ...] | None): Axis along which to sum.
             Defaults to None (sum over all axes).
         keepdims (bool, optional): Whether to keep the reduced dimensions.
             Defaults to False.
