@@ -1,23 +1,18 @@
 """Test script for TensorSlow library."""
 
-import matplotlib.pyplot as plt
 import numpy as np
 
-from tensorslow.nn.activations import sigmoid
+from tensorslow.nn.loss import mse_loss
 from tensorslow.tensor import Tensor
 
-a = Tensor(np.random.uniform(-10, 10, 50))
-bias = Tensor(1)
+x = Tensor(np.linspace(-10, 10, 50))
+y = x * 4 + 2 + Tensor(np.random.randn(50) * 3)
 
-c = sigmoid(a * 2 + bias)
-c.backward()
+m = Tensor(np.random.randn())
+b = Tensor(np.random.randn())
+c = m * x + b
+diff = mse_loss(c, y)
+diff.backward()
 
-print("a grad:", a.grad)
-print("bias grad:", bias.grad)
-
-plt.plot(a.data, a.grad, ".")
-plt.title("Gradient of sigmoid at different inputs")
-plt.xlabel("Input value")
-plt.ylabel("Gradient value")
-plt.grid()
-plt.show()
+print("a grad:", m.grad)
+print("bias grad:", b.grad)
