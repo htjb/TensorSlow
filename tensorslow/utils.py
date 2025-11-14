@@ -78,6 +78,5 @@ def zero_grad(a: Tensor) -> None:
             topo.append(v)
 
     build_topo(a)
-    print(len(topo), len(visited))
     for node in reversed(topo):
         node.grad = np.zeros_like(node.data, dtype=np.float64)
