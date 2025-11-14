@@ -25,11 +25,6 @@ class Tensor(TensorBase):
                     Defaults to "".
         """
         super().__init__(data, _children, _op)
-        Tensor.__add__ = add
-        Tensor.__mul__ = mul
-        Tensor.__sub__ = sub
-        Tensor.__pow__ = pow
-        Tensor.__truediv__ = div
 
 
 def add(a: Tensor, b: Tensor | int | float | np.ndarray) -> Tensor:
@@ -140,3 +135,9 @@ def div(a: Tensor, b: Tensor | int | float | np.ndarray) -> Tensor:
 
     out._backward = _backward
     return out
+
+Tensor.__add__ = add
+Tensor.__mul__ = mul
+Tensor.__sub__ = sub
+Tensor.__pow__ = pow
+Tensor.__truediv__ = div
