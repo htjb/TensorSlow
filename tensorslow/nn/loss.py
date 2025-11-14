@@ -6,30 +6,31 @@ from tensorslow.math import abs, sum
 from tensorslow.tensor import Tensor
 
 
-def mse_loss(predicitons: Tensor, target: Tensor) -> Tensor:
+def mse_loss(predictions: Tensor, target: Tensor) -> Tensor:
     """Mean Squared Error Loss placeholder.
 
     Args:
-        predicitons (Tensor): Predicted values.
+        predictions (Tensor): Predicted values.
         target (Tensor): Ground truth values.
 
     Returns:
         Tensor: Computed MSE loss.
     """
-    out = sum((predicitons - target) ** 2) / predicitons.data.size
+    out = sum((predictions - target) ** 2) / predictions.data.size
 
     def _backward() -> None:
         """Backward pass for MSE Loss."""
-        predicitons.grad += (
-            (2 / predicitons.data.size)
-            * (predicitons.data - target.data)
+        predictions.grad += (
+            (2 / predictions.data.size)
+            * (predictions.data - target.data)
             * out.grad
         )
         target.grad += (
-            (-2 / predicitons.data.size)
-            * (predicitons.data - target.data)
+            (-2 / predictions.data.size)
+            * (predictions.data - target.data)
             * out.grad
         )
+
     out._backward = _backward
     return out
 
@@ -52,5 +53,6 @@ def mae_loss(predictions: Tensor, target: Tensor) -> Tensor:
         grad = (1 / predictions.data.size) * np.sign(diff) * out.grad
         predictions.grad += grad
         target.grad += -grad
+
     out._backward = _backward
     return out
