@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from tensorslow.tensor import Tensor
+from tensorslow.base import TensorBase
 
 
 def unreduce_grad(
@@ -54,7 +54,8 @@ def unbroadcast_grad(
             grad = grad.sum(axis=axis, keepdims=True)
     return grad
 
-def zero_grad(a: Tensor) -> None:
+
+def zero_grad(a: TensorBase) -> None:
     """Reset gradients of all tensors in the computation graph.
 
     Args:
@@ -62,7 +63,7 @@ def zero_grad(a: Tensor) -> None:
     """
     topo, visited = [], set()
 
-    def build_topo(v: Tensor) -> None:
+    def build_topo(v: TensorBase) -> None:
         """Build topological order of the computation graph.
 
         Traverse through the computation graph and for each tensor v
