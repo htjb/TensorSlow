@@ -71,7 +71,7 @@ def zero_grad(a: TensorBase) -> None:
         explore the parents. Once all dependencies have been explored
         append v to the topology. Effectively checks each branch of
         the graph all the way back to initial tensors. topo has nodes
-        ordered from input to ouput so needs reversing.
+        ordered from input to output so needs reversing.
 
         Args:
             v (TensorBase): Current tensor node being explored.
