@@ -16,9 +16,7 @@ def mse_loss(predictions: Tensor, target: Tensor) -> Tensor:
     Returns:
         Tensor: Computed MSE loss.
     """
-    needs_grad = predictions.requires_grad or target.requires_grad
     out = sum((predictions - target) ** 2) / predictions.data.size
-    out.requires_grad = needs_grad
 
     def _backward() -> None:
         """Backward pass for MSE Loss."""
@@ -49,9 +47,7 @@ def mae_loss(predictions: Tensor, target: Tensor) -> Tensor:
     Returns:
         Tensor: Computed MAE loss.
     """
-    needs_grad = predictions.requires_grad or target.requires_grad
     out = sum(abs(predictions - target)) / predictions.data.size
-    out.requires_grad = needs_grad
 
     def _backward() -> None:
         """Backward pass for MAE Loss."""
