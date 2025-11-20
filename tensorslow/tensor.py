@@ -29,8 +29,6 @@ class Tensor(TensorBase):
         """
         super().__init__(data, _children, _op)
         self.requires_grad = requires_grad
-        if not self.requires_grad:
-            self.grad = np.zeros_like(self.data)
 
 
 def add(a: Tensor, b: Tensor | int | float | np.ndarray) -> Tensor:
