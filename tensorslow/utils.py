@@ -59,7 +59,8 @@ def zero_grad(a: TensorBase) -> None:
     """Reset gradients of all tensors in the computation graph.
 
     Args:
-        a (Tensor): The output tensor from which to start the backpropagation.
+        a (TensorBase): The output tensor from which to
+            start the backpropagation.
     """
     topo, visited = [], set()
 
@@ -71,6 +72,9 @@ def zero_grad(a: TensorBase) -> None:
         append v to the topology. Effectively checks each branch of
         the graph all the way back to initial tensors. topo has nodes
         ordered from input to ouput so needs reversing.
+
+        Args:
+            v (TensorBase): Current tensor node being explored.
         """
         if v not in visited:
             visited.add(v)
