@@ -5,16 +5,17 @@ import numpy as np
 
 from tensorslow.nn.loss import mse_loss
 from tensorslow.tensor import Tensor
+from tensorslow.utils import zero_grad
 
-x = Tensor(np.linspace(-10, 10, 50))
-y = x * 4 + 2 + Tensor(np.random.randn(50) * 3)
+x = Tensor(np.linspace(-10, 10, 500))
+y = x * 4 + 2 + Tensor(np.random.randn(500) * 3)
 
-m = Tensor(np.random.randn())
-b = Tensor(np.random.randn())
+m = Tensor(np.random.randn(), requires_grad=True)
+b = Tensor(np.random.randn(), requires_grad=True)
 
-learning_rate = 0.001
+learning_rate = 0.0001
 
-loss = []
+loss_history = []
 for i in range(1000):
     c = m * x + b
     loss = mse_loss(c, y)
@@ -23,13 +24,16 @@ for i in range(1000):
     b.data -= learning_rate * b.grad
     if i % 100 == 0:
         print(f"Iteration {i}: Loss = {loss.data}")
-    m.grad = np.zeros_like(m.data)
-    b.grad = np.zeros_like(b.data)
-    x.grad = np.zeros_like(x.data)
-    y.grad = np.zeros_like(y.data)
-    loss.grad = np.zeros_like(loss.data)
+    zero_grad(loss)
+    loss_history.append(loss.data)
 
 plt.plot(x.data, y.data, "o", label="Data")
 plt.plot(x.data, (m.data * x.data + b.data), label="Fitted Line")
+plt.legend()
+plt.show()
+
+plt.plot(range(1000), loss_history, label="MSE Loss")
+plt.xlabel("Iteration")
+plt.ylabel("Loss")
 plt.legend()
 plt.show()

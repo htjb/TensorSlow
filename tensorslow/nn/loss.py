@@ -20,16 +20,18 @@ def mse_loss(predictions: Tensor, target: Tensor) -> Tensor:
 
     def _backward() -> None:
         """Backward pass for MSE Loss."""
-        predictions.grad += (
-            (2 / predictions.data.size)
-            * (predictions.data - target.data)
-            * out.grad
-        )
-        target.grad += (
-            (-2 / predictions.data.size)
-            * (predictions.data - target.data)
-            * out.grad
-        )
+        if predictions.requires_grad:
+            predictions.grad += (
+                (2 / predictions.data.size)
+                * (predictions.data - target.data)
+                * out.grad
+            )
+        if target.requires_grad:
+            target.grad += (
+                (-2 / predictions.data.size)
+                * (predictions.data - target.data)
+                * out.grad
+            )
 
     out._backward = _backward
     return out
@@ -51,8 +53,10 @@ def mae_loss(predictions: Tensor, target: Tensor) -> Tensor:
         """Backward pass for MAE Loss."""
         diff = predictions.data - target.data
         grad = (1 / predictions.data.size) * np.sign(diff) * out.grad
-        predictions.grad += grad
-        target.grad += -grad
+        if predictions.requires_grad:
+            predictions.grad += grad
+        if target.requires_grad:
+            target.grad += -grad
 
     out._backward = _backward
     return out

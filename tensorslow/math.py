@@ -15,12 +15,13 @@ def exp(a: Tensor) -> Tensor:
     Returns:
         Tensor: Output tensor after applying exponential function.
     """
-    out = Tensor(np.exp(a.data), (a,), "exp")
+    out = Tensor(np.exp(a.data), (a,), "exp", requires_grad=a.requires_grad)
 
     def _backward() -> None:
         """Backward pass for exponential function."""
         # local derivative wrt a * out.grad
-        a.grad += np.exp(a.data) * out.grad
+        if a.requires_grad:
+            a.grad += np.exp(a.data) * out.grad
 
     out._backward = _backward
     return out
@@ -43,11 +44,17 @@ def sum(
     Returns:
         Tensor: Output tensor after summation.
     """
-    out = Tensor(np.sum(a.data, axis=axis, keepdims=keepdims), (a,), "sum")
+    out = Tensor(
+        np.sum(a.data, axis=axis, keepdims=keepdims),
+        (a,),
+        "sum",
+        requires_grad=a.requires_grad,
+    )
 
     def _backward() -> None:
         """Backward pass for summation."""
-        a.grad += unreduce_grad(out.grad, a.shape, axis=axis)
+        if a.requires_grad:
+            a.grad += unreduce_grad(out.grad, a.shape, axis=axis)
 
     out._backward = _backward
     return out
@@ -62,11 +69,12 @@ def abs(a: Tensor) -> Tensor:
     Returns:
         Tensor: Output tensor after applying absolute value function.
     """
-    out = Tensor(np.abs(a.data), (a,), "abs")
+    out = Tensor(np.abs(a.data), (a,), "abs", requires_grad=a.requires_grad)
 
     def _backward() -> None:
         """Backward pass for absolute value function."""
-        a.grad += np.sign(a.data) * out.grad
+        if a.requires_grad:
+            a.grad += np.sign(a.data) * out.grad
 
     out._backward = _backward
     return out
