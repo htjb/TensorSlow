@@ -80,4 +80,6 @@ def zero_grad(a: TensorBase) -> None:
 
     build_topo(a)
     for node in reversed(topo):
-        node.grad = np.zeros_like(node.data, dtype=np.float64)
+        if hasattr(node, "requires_grad"):
+            if node.requires_grad:
+                node.grad = np.zeros_like(node.data, dtype=np.float64)
